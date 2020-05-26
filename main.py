@@ -51,18 +51,9 @@ def parse_winner(player, opponent):
 
 def update_score():
     map_scores = open("mapscore.txt", "r+")
-    lines = map_scores.readlines()
-    i = 0
-    for x in lines:
-        if x.find(zerg) != -1:
-            x.replace(x, tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
-        if x.find(protoss) != -1:
-            x.replace(x, tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
-        if x.find(terran) != -1:
-            x.replace(x, tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
-        i += 1
-    for line in lines:
-        map_scores.write(line)
+    map_scores.write(tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
+    map_scores.write(tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
+    map_scores.write(tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
     map_scores.close()
 
 
