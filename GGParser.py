@@ -9,7 +9,11 @@ tracked_player = "kKo"
 # Change this to your race
 tracked_race = "Terran"
 # Change this to your SC2 replay folder (Starcraft II/Accounts/1234567/12345-5-S1/Replays/Multiplayer/*
-replay_folder = "C:/Users/walts/Documents/StarCraft II/Accounts/948824/2-S2-1-978970/Replays/Multiplayer/*"
+try:
+    replay_folder = "C:/Users/walts/Documents/StarCraft II/Accounts/948824/2-S2-1-978970/Replays/Multiplayer/*"
+except ValueError:
+    print("You didn't setup your replay folder path")
+
 # Folder polling rate in seconds
 poll_rate = 5
 
