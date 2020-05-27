@@ -12,14 +12,15 @@ tracked_race = "Terran"
 replay_folder = "C:/Users/walts/Documents/StarCraft II/Accounts/948824/2-S2-1-978970/Replays/Multiplayer/*"
 
 
+def get_latest_replay():
+    replay_list = glob.glob(replay_folder)
+    last_replay = max(replay_list, key=os.path.getctime)
+    return last_replay
+
+
 # Variables
-replay_path = "E:/Programming/GGParser/Nightshade LE (44).SC2Replay"
+replay_path = get_latest_replay()
 replay = sc2reader.load_replay(replay_path, load_level=4)
-
-
-players = replay.players
-player_1 = players[0]
-player_2 = players[1]
 
 zerg = "Zerg"
 protoss = "Protoss"
@@ -29,25 +30,16 @@ XvZ = [0, 0]
 XvP = [0, 0]
 XvT = [0, 0]
 
-# Testing
-print(player_1)
-print(player_2)
-print(replay.players)
-
-# Parsing races
-p1 = str(player_1)
-p2 = str(player_2)
-
 
 def get_latest_replay():
     global replay
     global replay_path
     replay_list = glob.glob(replay_folder)
-    last_replay = max(replay_list, key=os.path.getctime)
-    if replay_path != last_replay:
+    latest_replay = max(replay_list, key=os.path.getctime)
+    if replay_path != latest_replay:
         print("Old replay was: " + replay_path)
-        print("Newest replay is: " + last_replay)
-        replay_path = last_replay
+        print("Newest replay is: " + latest_replay)
+        replay_path = latest_replay
         replay = sc2reader.load_replay(replay_path, load_level=4)
         check_players()
 
@@ -74,16 +66,40 @@ def parse_winner(player, opponent):
 
 
 def update_score():
-    map_scores = open("mapscore.txt", "r+")
-    map_scores.write(tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
-    map_scores.write("\n")
-    map_scores.write(tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
-    map_scores.write("\n")
-    map_scores.write(tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
-    map_scores.close()
+    try:
+        map_scores = open("mapscore.txt", "r+")
+        map_scores.write(tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
+        map_scores.write("\n")
+        map_scores.write(tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
+        map_scores.write("\n")
+        map_scores.write(tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
+        map_scores.close()
+    except FileNotFoundError:
+        map_scores = open("mapscore.txt", "w")
+        map_scores.write(tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
+        map_scores.write("\n")
+        map_scores.write(tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
+        map_scores.write("\n")
+        map_scores.write(tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
+        map_scores.close()
+
+
 
 
 def check_players():
+    global replay
+    players = replay.players
+    player_1 = players[0]
+    player_2 = players[1]
+
+    # converting players to string
+    p1 = str(player_1)
+    p2 = str(player_2)
+
+    print(player_1)
+    print(player_2)
+    print(replay.players)
+
     if p1.find(tracked_player) != -1 and p1.find(tracked_race) != 1:
         parse_winner(player_1, player_2)
     elif p2.find(tracked_player) != -1 and p2.find(tracked_race) != -1:
