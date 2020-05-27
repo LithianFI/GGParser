@@ -84,8 +84,6 @@ def update_score():
         map_scores.close()
 
 
-
-
 def check_players():
     global replay
     players = replay.players
