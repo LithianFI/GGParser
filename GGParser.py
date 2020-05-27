@@ -55,16 +55,17 @@ class GGParser:
         self.initialize_txt()
 
         # Config
-        # Change this to match your in-game name
-        self.tracked_player = "Lithian"
-        # Change this to your race
-        self.tracked_race = "Protoss"
-        # Change this to your SC2 replay folder (Starcraft II/Accounts/1234567/12345-5-S1/Replays/Multiplayer/*
+        # Tracked Player
+        name = input("Type the player name you want to track \n")
+        self.tracked_player = name
+        # Tracked Race
+        race = input("Type the race you want to track (Zerg, Protoss, Terran) \n")
+        self.tracked_race = race
 
         try:
             self.replay_folder = f"{expanduser('~')}\\documents\\StarCraft II"
         except ValueError:
-            print("You didn't setup your replay folder path")
+            print("Replay folder not found, are you sure Starcraft II is installed?")
 
         # Folder polling rate in seconds
         self.poll_rate = 5
