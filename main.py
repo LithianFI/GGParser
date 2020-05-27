@@ -10,6 +10,8 @@ tracked_player = "kKo"
 tracked_race = "Terran"
 # Change this to your SC2 replay folder (Starcraft II/Accounts/1234567/12345-5-S1/Replays/Multiplayer/*
 replay_folder = "C:/Users/walts/Documents/StarCraft II/Accounts/948824/2-S2-1-978970/Replays/Multiplayer/*"
+# Folder polling rate in seconds
+poll_rate = 5
 
 
 def get_latest_replay():
@@ -106,6 +108,11 @@ def check_players():
         print(("Tracked Player " + tracked_player) + "-" + tracked_race + " not found in the replay, skipping")
 
 
+print("GGParser initialized")
+print("Tracking folder: " + replay_folder)
+print("Tracking player: " + tracked_player + " - " + tracked_race)
+print("Polling the folder every " + str(poll_rate) + " seconds")
+
 while True:
-    time.sleep(2)
+    time.sleep(poll_rate)
     get_latest_replay()
