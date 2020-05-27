@@ -1,1 +1,3 @@
-Terran v Zerg: 0-0Terran v Protoss: 0-0Terran v Terran: 0-681
+Terran v Zerg: 0-0
+Terran v Protoss: 0-0
+Terran v Terran: 0-17
