@@ -5,9 +5,9 @@ import time
 
 # Config
 # Change this to match your in-game name
-tracked_player = "kKo"
+tracked_player = "Lithian"
 # Change this to your race
-tracked_race = "Terran"
+tracked_race = "Protoss"
 # Change this to your SC2 replay folder (Starcraft II/Accounts/1234567/12345-5-S1/Replays/Multiplayer/*
 try:
     replay_folder = "C:/Users/walts/Documents/StarCraft II/Accounts/948824/2-S2-1-978970/Replays/Multiplayer/*"
@@ -32,6 +32,8 @@ zerg = "Zerg"
 protoss = "Protoss"
 terran = "Terran"
 
+opponent = "Null"
+
 XvZ = [0, 0]
 XvP = [0, 0]
 XvT = [0, 0]
@@ -50,11 +52,12 @@ def get_latest_replay():
         check_players()
 
 
-def parse_winner(player, opponent):
+def parse_winner(player, enemy):
     global replay
     winner = replay.winner
-    opponent_string = str(opponent)
-    if winner == player:
+    winner_string = str(winner)
+    opponent_string = str(enemy)
+    if winner_string.find(player) != -1:
         if opponent_string.find(zerg) != -1:
             XvZ[0] += 1
         if opponent_string.find(protoss) != -1:
@@ -90,26 +93,30 @@ def update_score():
         map_scores.close()
 
 
-def check_players():
+def parse_players():
     global replay
+    global opponent
+    global tracked_player
     players = replay.players
     player_1 = players[0]
     player_2 = players[1]
 
-    # converting players to string
     p1 = str(player_1)
     p2 = str(player_2)
 
-    print(player_1)
-    print(player_2)
-    print(replay.players)
-
-    if p1.find(tracked_player) != -1 and p1.find(tracked_race) != 1:
-        parse_winner(player_1, player_2)
-    elif p2.find(tracked_player) != -1 and p2.find(tracked_race) != -1:
-        parse_winner(player_2, player_1)
+    if p1.find(tracked_player) != -1:
+        opponent = p2
+    elif p2.find(tracked_player) != -1:
+        opponent = p1
     else:
         print(("Tracked Player " + tracked_player) + "-" + tracked_race + " not found in the replay, skipping")
+
+
+def check_players():
+    global replay
+    print(replay.players)
+    parse_players()
+    parse_winner(tracked_player, opponent)
 
 
 print("GGParser initialized")
