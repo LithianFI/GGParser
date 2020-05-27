@@ -113,6 +113,18 @@ print("Tracking folder: " + replay_folder)
 print("Tracking player: " + tracked_player + " - " + tracked_race)
 print("Polling the folder every " + str(poll_rate) + " seconds")
 
+
+def initialize_txt():
+    try:
+        map_scores = open("mapscore.txt", "r+")
+        map_scores.close()
+    except FileNotFoundError:
+        map_scores = open("mapscore.txt", "w")
+        map_scores.close()
+
+
+initialize_txt()
+
 while True:
     time.sleep(poll_rate)
     get_latest_replay()
