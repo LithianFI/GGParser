@@ -70,19 +70,19 @@ def parse_winner(player, opponent):
 def update_score():
     try:
         map_scores = open("mapscore.txt", "r+")
-        map_scores.write(tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
+        map_scores.write(tracked_race[0] + " v " + "Z" + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
         map_scores.write("\n")
-        map_scores.write(tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
+        map_scores.write(tracked_race[0] + " v " + "P" + ": " + str(XvP[0]) + "-" + str(XvP[1]))
         map_scores.write("\n")
-        map_scores.write(tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
+        map_scores.write(tracked_race[0] + " v " + "T" + ": " + str(XvT[0]) + "-" + str(XvT[1]))
         map_scores.close()
     except FileNotFoundError:
         map_scores = open("mapscore.txt", "w")
-        map_scores.write(tracked_race + " v " + zerg + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
+        map_scores.write(tracked_race[0] + " v " + "Z" + ": " + str(XvZ[0]) + "-" + str(XvZ[1]))
         map_scores.write("\n")
-        map_scores.write(tracked_race + " v " + protoss + ": " + str(XvP[0]) + "-" + str(XvP[1]))
+        map_scores.write(tracked_race[0] + " v " + "P" + ": " + str(XvP[0]) + "-" + str(XvP[1]))
         map_scores.write("\n")
-        map_scores.write(tracked_race + " v " + terran + ": " + str(XvT[0]) + "-" + str(XvT[1]))
+        map_scores.write(tracked_race[0] + " v " + "T" + ": " + str(XvT[0]) + "-" + str(XvT[1]))
         map_scores.close()
 
 
