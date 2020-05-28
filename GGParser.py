@@ -158,11 +158,13 @@ class GGParser:
         p2 = str(player_2)
 
         if p1.find(self.tracked_player) != -1:
-            self.opponent = p2
-            return 1
+            if p1.find(self.tracked_race) != -1:
+                self.opponent = p2
+                return 1
         elif p2.find(self.tracked_player) != -1:
-            self.opponent = p1
-            return 1
+            if p2.find(self.tracked_race) != -1:
+                self.opponent = p1
+                return 1
         else:
             print(("Tracked Player " + self.tracked_player) + "-" + self.tracked_race + " not found in the replay, skipping")
             return 0
