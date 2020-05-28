@@ -1,11 +1,7 @@
 import sc2reader
-import glob
 import os
-import time
 
 from os.path import expanduser
-
-
 import sys
 import time
 import threading
@@ -113,11 +109,11 @@ class GGParser:
             self.replay = sc2reader.load_replay(self.replay_path, load_level=4)
             self.check_players()
 
-    def parse_winner(self, player, enemy):
+    def parse_winner(self, enemy):
         winner = self.replay.winner
         winner_string = str(winner)
         opponent_string = str(enemy)
-        if winner_string:
+        if winner_string.find(self.tracked_player) != -1:
             if opponent_string.find(self.zerg) != -1:
                 self.XvZ.wins += 1
             if opponent_string.find(self.protoss) != -1:
@@ -175,7 +171,7 @@ class GGParser:
         print(self.replay.players)
         i = self.parse_players()
         if i == 1:
-            self.parse_winner(self.tracked_player, self.opponent)
+            self.parse_winner(self.opponent)
 
 
     @staticmethod
