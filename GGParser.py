@@ -64,7 +64,7 @@ class GGParser:
             print("Replay folder not found, are you sure Starcraft II is installed?")
 
         # Folder polling rate in seconds
-        self.poll_rate = 5
+        self.poll_rate = 1
 
         print("GGParser initialized")
         print("Tracking folder: " + self.replay_folder)
@@ -75,15 +75,13 @@ class GGParser:
         self.protoss = "Protoss"
         self.terran = "Terran"
 
-        self.opponent = "null"
-
         self.XvZ = Score()
         self.XvP = Score()
         self.XvT = Score()
+        self.XvR = Score()
 
         # Variables
         self.replay_path = self.get_latest_replay_init()
-        self.replay = sc2reader.load_replay(self.replay_path, load_level=4)
 
     def get_all_replays(self):
         replay_list = []
@@ -106,75 +104,78 @@ class GGParser:
             print("Old replay was: " + self.replay_path)
             print("Newest replay is: " + latest_replay)
             self.replay_path = latest_replay
-            self.replay = sc2reader.load_replay(self.replay_path, load_level=4)
-            self.check_players()
+            replay = sc2reader.load_replay(self.replay_path, load_level=4)
+            self.check_players(replay)
 
-    def parse_winner(self, enemy):
-        winner = self.replay.winner
-        winner_string = str(winner)
-        opponent_string = str(enemy)
-        if winner_string.find(self.tracked_player) != -1:
-            if opponent_string.find(self.zerg) != -1:
-                self.XvZ.wins += 1
-            if opponent_string.find(self.protoss) != -1:
-                self.XvP.wins += 1
-            if opponent_string.find(self.terran) != -1:
-                self.XvT.wins += 1
+    def check_players(self, replay):
+        print(replay.players)
+        players = replay.players
+
+        i = self.parse_enemy(players)
+        if i != -1:
+            self.parse_winner(replay, i)
+
+    def parse_enemy(self, players):
+        player_1 = players[0]
+        player_2 = players[1]
+
+        if player_1.name == self.tracked_player and player_1.pick_race == self.tracked_race:
+            return player_2
+
+        if player_2.name == self.tracked_player and player_2.pick_race == self.tracked_race:
+            return player_1
+
         else:
-            if opponent_string.find(self.zerg) != -1:
+            print(
+                "Tracked Player " + self.tracked_player + "-" + self.tracked_race + " not found in the replay, skipping")
+            return -1
+
+    def parse_winner(self, replay, enemy):
+        winner = replay.winner
+        if winner.players[0].name != enemy.name:
+            if enemy.pick_race == "Zerg":
+                self.XvZ.wins += 1
+            if enemy.pick_race == "Protoss":
+                self.XvP.wins += 1
+            if enemy.pick_race == "Terran":
+                self.XvT.wins += 1
+            if enemy.pick_race == "Random":
+                self.XvR.wins += 1
+        else:
+            if enemy.pick_race == "Zerg":
                 self.XvZ.loses += 1
-            if opponent_string.find(self.protoss) != -1:
+            if enemy.pick_race == "Protoss":
                 self.XvP.loses += 1
-            if opponent_string.find(self.terran) != -1:
+            if enemy.pick_race == "Terran":
                 self.XvT.loses += 1
+            if enemy.pick_race == "Random":
+                self.XvR.loses += 1
         self.update_score()
 
     def update_score(self):
         try:
             print("Updating the file")
             map_scores = open("mapscore.txt", "r+")
-            map_scores.write(self.tracked_race[0] + " v " + "Z" + ": " + str(self.XvZ.wins) + "-" + str(self.XvZ.loses))
+            map_scores.write(self.tracked_race[0] + "v" + "Z" + ": " + str(self.XvZ.wins) + "-" + str(self.XvZ.loses))
             map_scores.write("\n")
-            map_scores.write(self.tracked_race[0] + " v " + "P" + ": " + str(self.XvP.wins) + "-" + str(self.XvP.loses))
+            map_scores.write(self.tracked_race[0] + "v" + "P" + ": " + str(self.XvP.wins) + "-" + str(self.XvP.loses))
             map_scores.write("\n")
-            map_scores.write(self.tracked_race[0] + " v " + "T" + ": " + str(self.XvT.wins) + "-" + str(self.XvT.loses))
+            map_scores.write(self.tracked_race[0] + "v" + "T" + ": " + str(self.XvT.wins) + "-" + str(self.XvT.loses))
+            map_scores.write("\n")
+            map_scores.write(self.tracked_race[0] + "v" + "R" + ": " + str(self.XvR.wins) + "-" + str(self.XvR.loses))
+        #  map_scores.write("Debug, done!")
             map_scores.close()
         except FileNotFoundError:
             print("File not found, creating new one and updating")
             map_scores = open("mapscore.txt", "w")
-            map_scores.write(self.tracked_race[0] + " v " + "Z" + ": " + str(self.XvZ.wins) + "-" + str(self.XvZ.loses))
+            map_scores.write(self.tracked_race[0] + "v" + "Z" + ": " + str(self.XvZ.wins) + "-" + str(self.XvZ.loses))
             map_scores.write("\n")
-            map_scores.write(self.tracked_race[0] + " v " + "P" + ": " + str(self.XvP.wins) + "-" + str(self.XvP.loses))
+            map_scores.write(self.tracked_race[0] + "v" + "P" + ": " + str(self.XvP.wins) + "-" + str(self.XvP.loses))
             map_scores.write("\n")
-            map_scores.write(self.tracked_race[0] + " v " + "T" + ": " + str(self.XvT.wins) + "-" + str(self.XvT.loses))
-            map_scores.close()
-
-    def parse_players(self):
-        players = self.replay.players
-        player_1 = players[0]
-        player_2 = players[1]
-
-        p1 = str(player_1)
-        p2 = str(player_2)
-
-        if p1.find(self.tracked_player) != -1:
-            if p1.find(self.tracked_race) != -1:
-                self.opponent = p2
-                return 1
-        elif p2.find(self.tracked_player) != -1:
-            if p2.find(self.tracked_race) != -1:
-                self.opponent = p1
-                return 1
-        else:
-            print(("Tracked Player " + self.tracked_player) + "-" + self.tracked_race + " not found in the replay, skipping")
-            return 0
-
-    def check_players(self):
-        print(self.replay.players)
-        i = self.parse_players()
-        if i == 1:
-            self.parse_winner(self.opponent)
-
+            map_scores.write(self.tracked_race[0] + "v" + "T" + ": " + str(self.XvT.wins) + "-" + str(self.XvT.loses))
+            map_scores.write("\n")
+            map_scores.write(self.tracked_race[0] + "v" + "R" + ": " + str(self.XvR.wins) + "-" + str(self.XvR.loses))
+        map_scores.close()
 
     @staticmethod
     def initialize_txt():
@@ -190,6 +191,7 @@ class GGParser:
             with Spinner():
                 time.sleep(self.poll_rate)
                 self.get_latest_replay()
+                # self.get_all_replays_and_analyze()
 
 
 if __name__ == "__main__":
