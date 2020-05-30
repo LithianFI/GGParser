@@ -6,6 +6,8 @@ import sys
 import time
 import threading
 
+from sc2reader.utils import Length
+
 
 class Spinner:
     busy = False
@@ -64,7 +66,9 @@ class GGParser:
             print("Replay folder not found, are you sure Starcraft II is installed?")
 
         # Folder polling rate in seconds
-        self.poll_rate = 1
+        self.poll_rate = 5
+        # Minimum length of a game
+        self.min_length = Length(seconds=60)
 
         print("GGParser initialized")
         print("Tracking folder: " + self.replay_folder)
@@ -105,7 +109,10 @@ class GGParser:
             print("Newest replay is: " + latest_replay)
             self.replay_path = latest_replay
             replay = sc2reader.load_replay(self.replay_path, load_level=4)
-            self.check_players(replay)
+            if replay.real_length > self.min_length:
+                self.check_players(replay)
+            else:
+                print("Found replay is too short, skipping")
 
     def check_players(self, replay):
         print(replay.players)
