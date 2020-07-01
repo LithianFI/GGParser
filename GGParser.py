@@ -5,8 +5,10 @@ from os.path import expanduser
 import sys
 import time
 import threading
+import subprocess
 
 from sc2reader.utils import Length
+from sys import platform
 
 
 class Spinner:
@@ -60,10 +62,18 @@ class GGParser:
         race = input("Type the race you want to track (Zerg, Protoss, Terran) \n")
         self.tracked_race = race
 
-        try:
-            self.replay_folder = f"{expanduser('~')}\\documents\\StarCraft II"
-        except ValueError:
-            print("Replay folder not found, are you sure Starcraft II is installed?")
+        if platform == "win32":
+            try:
+                self.replay_folder = f"{expanduser('~')}\\documents\\StarCraft II"
+            except ValueError:
+                print("Replay folder not found, are you sure Starcraft II is installed?")
+        elif platform == "linux" or platform == "linux2":
+            try:
+                self.replay_folder = os.environ['SC2_REPLAYS']
+            except KeyError:
+                print("Replay folder not found, are you sure Starcraft II is installed?")
+                self.replay_folder = input("Provide path to your SC2 replay folder. "
+                                           "This is usually located under .wine \n")
 
         # Folder polling rate in seconds
         self.poll_rate = 5
@@ -98,21 +108,27 @@ class GGParser:
 
     def get_latest_replay_init(self):
         replay_list = self.get_all_replays()
-        last_replay = max(replay_list, key=os.path.getctime)
-        return last_replay
+        try:
+            last_replay = max(replay_list, key=os.path.getctime)
+            return last_replay
+        except ValueError:
+            print("No replays found")
 
     def get_latest_replay(self):
         replay_list = self.get_all_replays()
-        latest_replay = max(replay_list, key=os.path.getctime)
-        if self.replay_path != latest_replay:
-            print("Old replay was: " + self.replay_path)
-            print("Newest replay is: " + latest_replay)
-            self.replay_path = latest_replay
-            replay = sc2reader.load_replay(self.replay_path, load_level=4)
-            if replay.real_length > self.min_length:
-                self.check_players(replay)
-            else:
-                print("Found replay is too short, skipping")
+        try:
+            latest_replay = max(replay_list, key=os.path.getctime)
+            if self.replay_path != latest_replay:
+                print("Old replay was: " + self.replay_path)
+                print("Newest replay is: " + latest_replay)
+                self.replay_path = latest_replay
+                replay = sc2reader.load_replay(self.replay_path, load_level=4)
+                if replay.real_length > self.min_length:
+                    self.check_players(replay)
+                else:
+                    print("Found replay is too short, skipping")
+        except ValueError:
+            print("No replays found")
 
     def check_players(self, replay):
         print(replay.players)
